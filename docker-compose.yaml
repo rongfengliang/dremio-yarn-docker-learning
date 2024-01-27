@@ -1,0 +1,79 @@
+version: "3"
+services:
+  zk:
+    image: zookeeper
+    ports:
+      - 2181:2181
+  namenode:
+    image: apache/hadoop:3
+    hostname: namenode
+    command: ["hdfs", "namenode"]
+    ports:
+      - 9870:9870
+    env_file:
+      - ./config
+    environment:
+      ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+  datanode:
+    image: apache/hadoop:3
+    command: ["hdfs", "datanode"]
+    env_file:
+      - ./config
+  resourcemanager:
+    image: apache/hadoop:3
+    hostname: resourcemanager
+    command: ["yarn", "resourcemanager"]
+    ports:
+      - 8088:8088
+    env_file:
+      - ./config
+    volumes:
+      - ./test.sh:/opt/test.sh
+  nodemanager:
+    image: apache/hadoop:3
+    command: ["yarn", "nodemanager"]
+    env_file:
+      - ./config
+  mysql:
+    image: mysql:5.6
+    command: --character-set-server=utf8
+    ports:
+      - "3308:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=dalong
+      - MYSQL_USER=boss
+      - MYSQL_DATABASE=boss
+      - MYSQL_PASSWORD=dalong
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "19001:19001"
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server --console-address :19001 --quiet /data
+  dremio:
+    build: .
+    environment:
+      - name=value
+    ports:
+      - "9047:9047"
+      - "31010:31010"
+      - "9090:9090"
+  pg:
+    image: postgres:16.0
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=dalongdemo
+  nessie:
+    image: projectnessie/nessie:0.75.0-java
+    environment:
+      - NESSIE_VERSION_STORE_TYPE=JDBC
+      - QUARKUS.DATASOURCE.USERNAME=postgres
+      - QUARKUS.DATASOURCE.PASSWORD=dalongdemo
+      - QUARKUS_DATASOURCE_JDBC_URL=jdbc:postgresql://pg:5432/postgres
+    ports:
+      - "19120:19120"
+      - "19121:19121"

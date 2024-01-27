@@ -1,0 +1,14 @@
+<configuration>
+<property>
+    <name>hadoop.proxyuser.dremio.hosts</name>
+    <value>*</value>
+  </property>
+  <property>
+    <name>hadoop.proxyuser.dremio.groups</name>
+    <value>*</value>
+  </property>
+  <property>
+    <name>hadoop.proxyuser.dremio.users</name>
+    <value>*</value>
+</property>
+</configuration>
